@@ -8,14 +8,13 @@
             integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
             crossorigin="anonymous"></script>
 
-
     <script>
         var access_token = "";
 
         function CallToken()
         {
             $.ajax({
-                type: 'POST'
+                type: "POST"
                 , url: "http://localhost:1207/connect/token"
                 , data: {
                     "grant_type": "client_credentials"
@@ -23,7 +22,7 @@
                     , "client_secret": "secret1"
                     , "scope": "scope.readaccess"
                 }
-                , dataType: 'json'
+                , dataType: "json"
                 , success: function (result) {
                     console.log(result);
                     access_token = result.access_token;

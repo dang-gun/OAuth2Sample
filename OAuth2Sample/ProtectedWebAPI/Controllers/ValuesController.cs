@@ -9,7 +9,8 @@ namespace ProtectedWebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // THIS IS THE KEY ATTRIBUTE TO ACTIVATE SECURITY FEATURES IN OUR WEBAPI
+    //OAuth2 인증 설정
+    [Authorize]
     public class ValuesController : ControllerBase
     {
         // GET api/values

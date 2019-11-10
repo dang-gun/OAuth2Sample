@@ -11,6 +11,9 @@
     <script>
         var access_token = "";
 
+        /**
+         * 토큰 요청
+         */
         function CallToken() {
             $.ajax({
                 type: "POST"
@@ -30,7 +33,10 @@
 
         }
 
-        function GallValues()
+        /**
+         * API 호출
+         */
+        function CallValues()
         {
             $.ajax({
                 type: "GET"

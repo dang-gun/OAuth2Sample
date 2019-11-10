@@ -39,8 +39,10 @@ namespace ProtectedWebAPI
             {
                 o.Audience = "apiApp";
 
+                //인증서버의 주소
                 o.Authority = "http://localhost:1207";
                 o.RequireHttpsMetadata = false;
+                //인증서버에서 선언한 권한
                 o.Audience = "scope.readaccess";
             });
         }
@@ -60,9 +62,7 @@ namespace ProtectedWebAPI
 
             //인증 요청
             app.UseAuthentication();
-
-
-            //add this line to show the ERROR STATUS CODES
+            //에러가 났을때 Http 상태코드를 전달하기위한 설정
             app.UseStatusCodePages();
 
             //웹사이트 기본파일 읽기 설정
