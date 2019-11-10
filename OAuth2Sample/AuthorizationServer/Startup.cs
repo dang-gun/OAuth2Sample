@@ -19,6 +19,7 @@ namespace AuthorizationServer
             //AddInMemoryApiResources   : OAuth2 미들웨어(IdentityServer) 설정
             //AddInMemoryClients        : OAuth2 미들웨어(IdentityServer) 설정
             services.AddIdentityServer()
+                    .AddDeveloperSigningCredential()
                     .AddInMemoryApiResources(Config.GetApiResources())
                     .AddInMemoryClients(Config.GetClients());
 
@@ -28,8 +29,15 @@ namespace AuthorizationServer
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+
+            //OAuth2 미들웨어(IdentityServer) 접근 권한
+            app.UseCors(options =>
+            {
+                options.AllowAnyOrigin();
+            });
             //OAuth2 미들웨어(IdentityServer) 설정
             app.UseIdentityServer();
+            
 
             if (env.IsDevelopment())
             {
@@ -40,7 +48,6 @@ namespace AuthorizationServer
             //{
             //    await context.Response.WriteAsync("Hello World!");
             //});
-
 
             //웹사이트 기본파일 읽기 설정
             app.UseDefaultFiles();

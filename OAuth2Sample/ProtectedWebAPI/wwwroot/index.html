@@ -8,22 +8,20 @@
             integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
             crossorigin="anonymous"></script>
 
-
     <script>
         var access_token = "";
 
-        function CallToken()
-        {
+        function CallToken() {
             $.ajax({
-                type: 'POST'
+                type: "POST"
                 , url: "http://localhost:1207/connect/token"
+                , dataType: "json"
                 , data: {
                     "grant_type": "client_credentials"
                     , "client_id": "ClientIdThatCanOnlyRead"
                     , "client_secret": "secret1"
                     , "scope": "scope.readaccess"
                 }
-                , dataType: 'json'
                 , success: function (result) {
                     console.log(result);
                     access_token = result.access_token;
@@ -31,9 +29,28 @@
             });
 
         }
+
+        function GallValues()
+        {
+            $.ajax({
+                type: "GET"
+                
+                , url: "https://localhost:44341/api/values"
+                , headers: {
+                    "authorization": "Bearer " + access_token
+                }
+                , dataType: "json"
+                , data: {
+                }
+                
+                , success: function (result) {
+                    console.log(result);
+                }
+            });
+        }
     </script>
 </head>
 <body>
-    이 서버는 인증만 가능합니다.
+    API 호출만 가능합니다.
 </body>
 </html>
