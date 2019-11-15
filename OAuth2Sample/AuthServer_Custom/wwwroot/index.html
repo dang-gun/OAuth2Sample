@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous"></script>
+
+    <script>
+        var sUrl = "https://localhost:44377/connect/token";
+        var access_token = "";
+        var refresh_token = "";
+
+        /** 토큰 요청 */
+        function CallToken()
+        {
+            $.ajax({
+                type: "POST"
+                , url: sUrl
+                , data: {
+                    "grant_type": "password"
+                    , "client_id": "resourceownerclient"
+                    , "client_secret": "dataEventRecordsSecret"
+                    , "scope": "dataEventRecords offline_access"
+                    , "username": "raphael"
+                    , "password": "raphael"
+                }
+                , dataType: "json"
+                , success: function (result) {
+                    console.log(result);
+                    access_token = result.access_token;
+                    refresh_token = result.refresh_token;
+                }
+            });
+        }
+
+        /** 액세스 토큰 갱신 */
+        function RefreshToAccess()
+        {
+            $.ajax({
+                type: "POST"
+                , url: sUrl
+                , data: {
+                    "grant_type": "refresh_token"
+                    , "client_id": "resourceownerclient"
+                    , "client_secret": "dataEventRecordsSecret"
+                    , "scope": "dataEventRecords offline_access"
+                    , "refresh_token" : refresh_token
+                }
+                , dataType: "json"
+                , success: function (result) {
+                    console.log(result);
+                    access_token = result.access_token;
+                    refresh_token = result.refresh_token;
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    이 서버는 인증만 가능합니다.
+</body>
+</html>
