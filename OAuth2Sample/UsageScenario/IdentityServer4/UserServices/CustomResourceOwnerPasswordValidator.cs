@@ -36,10 +36,15 @@ namespace IdentityServer4_Custom.UserServices
             else
             {//실패
 
+                //실패 코드 작성
+                Dictionary<string, object> dictError = new Dictionary<string, object>();
+                dictError.Add("errorCode", "1");
                 
+                //실패 메시지 전달
                 context.Result
                     = new GrantValidationResult(TokenRequestErrors.InvalidGrant
-                        , "invalid custom credential");
+                        , "invalid credential"
+                        , dictError);
             }
 
             

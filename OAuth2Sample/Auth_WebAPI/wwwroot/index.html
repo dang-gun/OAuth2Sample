@@ -36,6 +36,29 @@
             });
         }
 
+        /** 토큰 요청2 */
+        function CallToken2()
+        {
+            $.ajax({
+                type: "POST"
+                , url: sUrl + "/connect/token"
+                , data: {
+                    "grant_type": "password"
+                    , "client_id": "resourceownerclient"
+                    , "client_secret": "dataEventRecordsSecret"
+                    , "scope": "dataEventRecords offline_access"
+                    , "username": "raphael"
+                    , "password": "raphael2"
+                }
+                , dataType: "json"
+                , success: function (result) {
+                    console.log(result);
+                    access_token = result.access_token;
+                    refresh_token = result.refresh_token;
+                }
+            });
+        }
+
         /** 액세스 토큰 갱신 */
         function RefreshToAccess()
         {

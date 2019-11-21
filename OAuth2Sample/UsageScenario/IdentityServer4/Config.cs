@@ -28,7 +28,15 @@ namespace IdentityServer4_Custom.IdentityServer4
                             DisplayName = "Scope for the dataEventRecords ApiResource"
                         }
                     }
-                    , UserClaims = { "role", "admin", "user", "dataEventRecords", "dataEventRecords.admin", "dataEventRecords.user" }
+                    , UserClaims = 
+                    { 
+                        "role"
+                        , "admin"
+                        , "user"
+                        , "dataEventRecords"
+                        , "dataEventRecords.admin"
+                        , "dataEventRecords.user" 
+                    }
                 }//end new ApiResource
             };//end return
         }
