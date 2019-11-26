@@ -1,0 +1,237 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous"></script>
+
+    <script>
+        var sUrl = "https://localhost:44343";
+        var sApi = "/api/values";
+
+        var access_token = "";
+        var refresh_token = "";
+
+        var client_id = "resourceownerclient";
+        var client_secret = "dataEventRecordsSecret";
+        var scope = "dataEventRecords offline_access";
+
+        /**
+         * 로그인 시도
+         * @param sID 아이디
+         * @param sPW 비밀번호
+         */
+        function funcLogin(sID, sPW)
+        {
+            //로그인을 시도하여 토큰을 받아온다.
+            $.ajax({
+                type: "POST"
+                , url: sUrl + "/api/Auth/SignIn"
+                , data: {
+                    "sID": sID
+                    , "sPW": sPW
+                }
+                , dataType: "json"
+                , success: function (jsonResult) {
+                    console.log(jsonResult);
+
+                    if (jsonResult.infoCode === "0")
+                    {//성공
+                        //리턴받은 토큰을 저장한다.
+                        access_token = jsonResult.access_token;
+                        refresh_token = jsonResult.refresh_token;
+                    }
+                    else
+                    {//실패
+                        var sReturn = "";
+                        sReturn += "로그인 실패 : " + jsonResult.message + "\n";
+                        sReturn += "실패 사유 : ";
+
+                        switch (jsonResult.infoCode)
+                        {
+                            case "1"://에러코드 1
+                                sReturn += "아이디나 비밀번호가 틀렸습니다\n";
+                                break;
+                            default:
+                                sReturn += "알 수 없는 오류\n";
+                                break;
+                        }
+
+                        alert(sReturn);
+                    }
+            
+                }
+                , error: function (jqXHR, textStatus, errorThrown) {
+                    console.log(jqXHR);
+                }
+            });
+        }
+
+        /**
+         * 액세스 토큰 갱신
+         * @param callback 갱신이 성공하면 동작할 콜백
+         */
+        function RefreshToAccess(callback)
+        {
+            if ("" == refresh_token)
+            {//리플레시 토큰이 없다.
+                //리플레시 토큰이 없으면 토큰을 갱신할 수 없으므로
+                //로그인이 필요하다.
+                alert("로그인이 필요합니다.");
+            }
+            else
+            {//있다.
+
+                //갱신 시도
+                $.ajax({
+                    type: "POST"
+                    , url: sUrl + "/api/Auth/RefreshToAccess"
+                    , data: {
+                        "sRefreshToken" : refresh_token
+                    }
+                    , dataType: "json"
+                    , success: function (jsonResult) {
+                        console.log(jsonResult);
+
+                        if (jsonResult.infoCode === "0")
+                        {//성공
+                            //받은 토큰 다시 저장
+                            access_token = jsonResult.access_token;
+                            refresh_token = jsonResult.refresh_token;
+
+                            //요청한 콜백 진행
+                            if (typeof(callback) === "function")
+                            {
+                                callback();
+                            }
+                            
+                        }
+                        else
+                        {//실패
+                            //리플래시 토큰 요청이 실패하면 모든 토큰을 지워야 한다.
+                            access_token = "";
+                            refresh_token = "";
+
+                            alert("로그인이 필요합니다.");
+                        }
+                    }
+                    , error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(jqXHR);
+
+                        //리플래시 토큰 요청이 실패하면 모든 토큰을 지워야 한다.
+                        access_token = "";
+                        refresh_token = "";
+
+                        alert("로그인이 필요합니다.");
+                    }
+                });
+            }//end if
+        }
+
+        /**
+        * API 호출
+        * @param sUrlTarget API의 주소
+        * @param sType 요청 방식
+        * @param jsonData 전달할 데이터
+        */
+        function CallValues(sUrlTarget, sType, jsonData)
+        {
+            //변수 백업
+            var sUrlTarget_backup = sUrlTarget;
+            var sUrlType_backup = sType;
+            var jsonData_backup = jsonData;
+
+            //api 호출
+            var funcApiCall = function () {
+                $.ajax({
+                    type: sUrlType_backup
+                    , url: sUrlTarget_backup
+                    , headers: {
+                        "authorization": "Bearer " + access_token
+                    }
+                    , dataType: "json"
+                    , data: jsonData_backup
+                    , success: function (result) {
+                        console.log(result);
+
+                        alert("호출 성공 : " + result);
+                    }
+                    , error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(jqXHR);
+
+                        switch (jqXHR.status)
+                        {
+                            case 401://인증정보 잘못됨.
+                                //여기서 인증정보가 잘못됐다면 엑세스키가 잘못된 것이다.
+                                //엑세스키를 제거해주고
+                                access_token = "";
+                                //다시 API를 호출하여 리플레시키를 갱신한 후 
+                                //api를 다시 호출하도록하여 절차가 진행되도록 한다.
+                                CallValues(sUrlType_backup
+                                    , sUrlTarget_backup
+                                    , jsonData_backup);
+                                break;
+
+                            default:
+                                alert("알수 없는 오류가 발생하였습니다.");
+                                break;
+                        }//end switch
+                    }
+                });
+            };
+
+            if ("" == access_token)
+            {//엑세스 토큰이 없다.
+                //리플레시 토큰 있는지 확인
+                if ("" == refresh_token)
+                {//없다.
+                    alert("로그인이 필요합니다.");
+                }
+                else
+                {//있다.
+                    //토큰 갱신 요청
+                    RefreshToAccess(funcApiCall);
+                }
+            }
+            else
+            {//엑세스 토큰이 있다.
+                funcApiCall();
+            }
+        }
+
+        /** 토큰 요청 */
+        function CallToken()
+        {
+            funcLogin("raphael", "raphael");
+        }
+
+        /** 토큰 요청2 */
+        function CallToken2()
+        {
+            funcLogin("raphael", "raphael2");
+        }
+
+        /** 토큰 제거 */
+        function funcRemoveToken()
+        {
+            access_token = "";
+            refresh_token = "";
+        }
+
+        
+    </script>
+</head>
+<body>
+    <button onclick="CallToken()">로그인 시도(성공)</button><br /><br />
+    <button onclick="CallToken2()">로그인 시도(실패)</button><br /><br />
+    <br />
+    <button onclick="CallValues(sUrl + sApi, 'GET', {})">API 호출</button><br /><br />
+    <br />
+    <button onclick="RefreshToAccess()">토큰 재발급</button><br /><br />
+    <button onclick="funcRemoveToken()">토큰 제거</button><br /><br />
+</body>
+</html>
