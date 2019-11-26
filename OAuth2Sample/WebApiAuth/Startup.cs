@@ -51,7 +51,7 @@ namespace WebApiAuth
                 o.Audience = "apiApp";
 
                 //인증서버의 주소
-                o.Authority = "https://localhost:44305";
+                o.Authority = "https://localhost:44343";
                 o.RequireHttpsMetadata = false;
                 //인증서버에서 선언한 권한
                 o.Audience = "dataEventRecords";

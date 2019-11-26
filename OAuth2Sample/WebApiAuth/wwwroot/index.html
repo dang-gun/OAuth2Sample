@@ -71,6 +71,44 @@
             });
         }
 
+        /** 로그아웃 */
+        function funcLogout()
+        {
+            
+
+            //로그아웃을 시도한다.
+            $.ajax({
+                type: "POST"
+                , url: sUrl + "/api/Auth/SignOut"
+                , data: {
+                    "sRefreshToken": refresh_token
+                }
+                , dataType: "json"
+                , success: function (jsonResult) {
+                    console.log(jsonResult);
+
+                    if (jsonResult.infoCode === "0")
+                    {//성공
+                        //로그아웃 후 보낼 페이지
+                    }
+                    else
+                    {//실패
+                        //로그아웃은 서버에서 실패해도
+                        //클라이언트에서 토큰을 다 지우기 때문에
+                        //로그아웃이 된다.
+                        //적절한 작업을 한다.
+                    }
+            
+                }
+                , error: function (jqXHR, textStatus, errorThrown) {
+                    console.log(jqXHR);
+                }
+            });
+
+            //토큰 제거
+            funcRemoveToken();
+        }
+
         /**
          * 액세스 토큰 갱신
          * @param callback 갱신이 성공하면 동작할 콜백
@@ -233,5 +271,7 @@
     <br />
     <button onclick="RefreshToAccess()">토큰 재발급</button><br /><br />
     <button onclick="funcRemoveToken()">토큰 제거</button><br /><br />
+    <br />
+    <button onclick="funcLogout()">로그아웃</button><br /><br />
 </body>
 </html>

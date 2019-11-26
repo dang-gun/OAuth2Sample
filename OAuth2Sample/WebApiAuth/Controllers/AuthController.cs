@@ -52,10 +52,24 @@ namespace WebApiAuth.Controllers
                 smResult.refresh_token = tr.RefreshToken;
             }
 
-            
-
             return armResult.ToResult(smResult);
         }
+
+        [HttpPost]
+        [Route("SignOut")]
+        public ActionResult<SignInResultModel> SignOut(
+            [FromForm]string sRefreshToken)
+        {
+            ApiResultReadyModel armResult = new ApiResultReadyModel(this);
+            ApiResultBaseModel arbm = new ApiResultBaseModel();
+
+            //사인아웃에 필요한 작업을 한다.
+
+
+            //임시로 아이디를 넘긴다.
+            return armResult.ToResult(arbm);
+        }
+
 
         [HttpPost]
         [Route("RefreshToAccess")]
@@ -137,5 +151,6 @@ namespace WebApiAuth.Controllers
 
             return trRequestToken;
         }
+
     }
 }
