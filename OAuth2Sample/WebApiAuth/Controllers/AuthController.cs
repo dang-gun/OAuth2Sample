@@ -65,6 +65,8 @@ namespace WebApiAuth.Controllers
             ApiResultBaseModel arbm = new ApiResultBaseModel();
 
             //사인아웃에 필요한 작업을 한다.
+            //리플레시 토큰 제거
+            TokenRevocationResponse trr = RevocationTokenAsync(sRefreshToken).Result;
 
             //로컬 인증 쿠키 삭제 요청
             HttpContext.SignOutAsync();
@@ -72,7 +74,11 @@ namespace WebApiAuth.Controllers
             return armResult.ToResult(arbm);
         }
 
-
+        /// <summary>
+        /// 리플레시 토큰을 이용하여 엑세스토큰을 갱신 한다.
+        /// </summary>
+        /// <param name="sRefreshToken">리플레시 토큰</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("RefreshToAccess")]
         public ActionResult<SignInResultModel> RefreshToAccess(
@@ -149,6 +155,25 @@ namespace WebApiAuth.Controllers
                             Scope = "dataEventRecords offline_access",
 
                             RefreshToken = sRefreshToken
+                        });
+
+            return trRequestToken;
+        }
+
+        /// <summary>
+        /// 지정된 토큰 제거
+        /// </summary>
+        /// <param name="sRefreshToken"></param>
+        /// <returns></returns>
+        private async Task<TokenRevocationResponse> RevocationTokenAsync(string sRefreshToken)
+        {
+            //엑세스 토큰도 제거가 가능하지만
+            //이 시나리오에서는 리플레시 토큰만 제거하면 된다.
+            TokenRevocationResponse trRequestToken
+                = await hcAuthClient
+                        .RevokeTokenAsync(new TokenRevocationRequest
+                        {
+                            Token = sRefreshToken
                         });
 
             return trRequestToken;
