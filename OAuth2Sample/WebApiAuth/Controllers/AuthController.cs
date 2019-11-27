@@ -173,7 +173,12 @@ namespace WebApiAuth.Controllers
                 = await hcAuthClient
                         .RevokeTokenAsync(new TokenRevocationRequest
                         {
-                            Token = sRefreshToken
+                            Address = this.sIdentityServer4_Url + "connect/revocation",
+                            ClientId = "resourceownerclient",
+                            ClientSecret = "dataEventRecordsSecret",
+
+                            Token = sRefreshToken,
+                            TokenTypeHint = "refresh_token"
                         });
 
             return trRequestToken;
