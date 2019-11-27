@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using IdentityModel.Client;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ProjsctThis.Model.ApiModel;
@@ -65,7 +66,8 @@ namespace WebApiAuth.Controllers
 
             //사인아웃에 필요한 작업을 한다.
 
-
+            //로컬 인증 쿠키 삭제 요청
+            HttpContext.SignOutAsync();
             //임시로 아이디를 넘긴다.
             return armResult.ToResult(arbm);
         }
