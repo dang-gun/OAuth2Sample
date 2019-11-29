@@ -103,6 +103,10 @@ namespace WebApiAuth.Controllers
             {//에러가 없다.
                 smResult.access_token = tr.AccessToken;
                 smResult.refresh_token = tr.RefreshToken;
+
+                //유저 정보를 받는다.
+                UserInfoResponse inrUser
+                    = UserInfoAsync(smResult.access_token).Result;
             }
 
             return armResult.ToResult(smResult);
@@ -126,8 +130,8 @@ namespace WebApiAuth.Controllers
 
                             ClientId = "resourceownerclient",
                             ClientSecret = "dataEventRecordsSecret",
-                            Scope = "dataEventRecords offline_access",
-
+                            Scope = "openid dataEventRecords offline_access",
+                            //Scope = "dataEventRecords offline_access",
                             //유저 인증정보 : 아이디
                             UserName = sID,
                             //유저 인증정보 : 비밀번호
@@ -182,6 +186,27 @@ namespace WebApiAuth.Controllers
                         });
 
             return trRequestToken;
+        }
+
+        /// <summary>
+        /// 엑세스토큰을 이용하여 유저 정보를 받는다.
+        /// </summary>
+        /// <param name="sAccessToken"></param>
+        /// <returns></returns>
+        private async Task<UserInfoResponse> UserInfoAsync(string sAccessToken)
+        {
+            //var discoResponse = await this.discoverDocument();
+
+            UserInfoResponse uirUser
+                = await hcAuthClient
+                        .GetUserInfoAsync(new UserInfoRequest
+                        {
+                            Address = this.sIdentityServer4_Url + "connect/userinfo"
+
+                            , Token = sAccessToken,
+                        });
+
+            return uirUser;
         }
 
     }

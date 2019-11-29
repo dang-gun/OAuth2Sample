@@ -36,6 +36,7 @@ namespace WebApiAuth
                 .AddExtensionGrantValidator<MyExtensionGrantValidator>()
                 .AddInMemoryApiResources(Config.GetApiResources())
                 .AddInMemoryClients(Config.GetClients())
+                .AddInMemoryIdentityResources(Config.GetIdentityResources())
                 .AddCustomUserStore();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
